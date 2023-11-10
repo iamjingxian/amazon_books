@@ -1,0 +1,183 @@
+CREATE DATABASE amazon;
+USE amazon;
+
+SHOW GLOBAL VARIABLES LIKE 'local_infile';
+SET GLOBAL local_infile = TRUE;
+
+create table item_category (
+asin text,
+cid text);
+
+LOAD DATA LOCAL INFILE 'C:\\Users\\limyi\\Desktop\\Project Data\\MySQL data\\item_category.csv' 
+INTO TABLE item_category 
+FIELDS TERMINATED BY ',' 
+ENCLOSED BY '"'
+LINES TERMINATED BY '\r\n'
+IGNORE 1 ROWS;
+
+create table item_external (
+eid text,
+asin text);
+
+LOAD DATA LOCAL INFILE 'C:\\Users\\limyi\\Desktop\\Project Data\\MySQL data\\item_external.csv' 
+INTO TABLE item_external 
+FIELDS TERMINATED BY ',' 
+ENCLOSED BY '"'
+LINES TERMINATED BY '\r\n'
+IGNORE 1 ROWS;
+
+create table category (
+cid int,
+name text);
+
+LOAD DATA LOCAL INFILE 'C:\\Users\\limyi\\Desktop\\Project Data\\MySQL data\\category.csv' 
+INTO TABLE category 
+FIELDS TERMINATED BY ',' 
+ENCLOSED BY '"'
+LINES TERMINATED BY '\r\n'
+IGNORE 1 ROWS;
+
+create table author (
+aid INT,
+name text,
+average_rating double ,
+ratings_count int,
+text_reviews_count int);
+ 
+LOAD DATA LOCAL INFILE 'C:\\Users\\limyi\\Desktop\\Project Data\\MySQL data\\author.csv' 
+INTO TABLE author 
+FIELDS TERMINATED BY ',' 
+ENCLOSED BY '"'
+LINES TERMINATED BY '\r\n'
+IGNORE 1 ROWS;
+
+create table item_author (
+asin text,
+aid INT);
+ 
+LOAD DATA LOCAL INFILE 'C:\\Users\\limyi\\Desktop\\Project Data\\MySQL data\\item_author.csv' 
+INTO TABLE item_author 
+FIELDS TERMINATED BY ',' 
+ENCLOSED BY '"'
+LINES TERMINATED BY '\r\n'
+IGNORE 1 ROWS;
+
+create table also_bought (
+asin text,
+also_buy text);
+ 
+LOAD DATA LOCAL INFILE 'C:\\Users\\limyi\\Desktop\\Project Data\\MySQL data\\also_bought.csv' 
+INTO TABLE also_bought 
+FIELDS TERMINATED BY ',' 
+ENCLOSED BY '"'
+LINES TERMINATED BY '\r\n'
+IGNORE 1 ROWS;
+
+create table also_viewed (
+asin text,
+also_view text);
+ 
+LOAD DATA LOCAL INFILE 'C:\\Users\\limyi\\Desktop\\Project Data\\MySQL data\\also_viewed.csv' 
+INTO TABLE also_viewed 
+FIELDS TERMINATED BY ',' 
+ENCLOSED BY '"'
+LINES TERMINATED BY '\r\n'
+IGNORE 1 ROWS;
+
+create table review_user (
+rid text,
+uid text);
+ 
+LOAD DATA LOCAL INFILE 'C:\\Users\\limyi\\Desktop\\Project Data\\MySQL data\\user_review.csv' 
+INTO TABLE review_user
+FIELDS TERMINATED BY ','
+ENCLOSED BY '"'
+LINES TERMINATED BY '\r\n'
+IGNORE 1 ROWS;
+
+create table user (
+uid text,
+name text,
+verified text);
+ 
+LOAD DATA LOCAL INFILE 'C:\\Users\\limyi\\Desktop\\Project Data\\MySQL data\\user.csv' 
+INTO TABLE user
+FIELDS TERMINATED BY ',' 
+ENCLOSED BY '"'
+LINES TERMINATED BY '\r\n'
+IGNORE 1 ROWS;
+
+
+create table review (
+rid text,
+rating DECIMAL(10, 1),
+review_time text,
+summary text,
+unix_time text,
+vote int);
+ 
+LOAD DATA LOCAL INFILE 'C:\\Users\\limyi\\Desktop\\Project Data\\MySQL data\\review.csv' 
+INTO TABLE review
+FIELDS TERMINATED BY ',' 
+ENCLOSED BY '"'
+LINES TERMINATED BY '\r\n'
+IGNORE 1 ROWS
+(rid,@rating,@review_time,@summary,@unix_time,@vote)
+SET rating = NULLIF(@rating,''), 
+	review_time = NULLIF(@review_time,''),
+    summary = NULLIF(@summary,''),
+	unix_time = NULLIF(@unix_time,''),
+	vote = NULLIF(@vote,'');
+    
+create table item (
+asin text,
+title text,
+description text,
+price DECIMAL (10,2),
+`rank` INT,
+publisher text,
+publication_year int);
+ 
+LOAD DATA LOCAL INFILE 'C:\\Users\\limyi\\Desktop\\Project Data\\MySQL data\\items.csv' 
+INTO TABLE item
+FIELDS TERMINATED BY ',' 
+ENCLOSED BY '"'
+LINES TERMINATED BY '\r\n'
+IGNORE 1 ROWS
+(asin,@title,@description,@price,@`rank`,@publisher,@publication_year)
+SET title = NULLIF(@title,''), 
+	description = NULLIF(@description,''),
+    price = NULLIF(@price,''),
+	`rank` = NULLIF(@`rank`,''),
+	publisher = NULLIF(@publisher,''),
+    publication_year = NULLIF(@publication_year,0);
+    
+create table external (
+eid text,
+review_text text,
+rating text,
+n_votes int,
+platform text);
+ 
+LOAD DATA LOCAL INFILE 'C:\\Users\\limyi\\Desktop\\Project Data\\MySQL data\\external.csv' 
+INTO TABLE external
+FIELDS TERMINATED BY ',' 
+ENCLOSED BY '"'
+LINES TERMINATED BY '\r\n'
+IGNORE 1 ROWS
+(eid,@review_text,@rating,@n_votes,@platform)
+SET review_text = NULLIF(@review_text,''), 
+	rating = NULLIF(@rating,''),
+	n_votes = NULLIF(@n_votes,''),
+	platform = NULLIF(@platform,'');
+    
+create table item_review (
+rid text,
+asin text);
+ 
+LOAD DATA LOCAL INFILE 'C:\\Users\\limyi\\Desktop\\Project Data\\MySQL data\\item_review.csv' 
+INTO TABLE item_review
+FIELDS TERMINATED BY ',' 
+ENCLOSED BY '"'
+LINES TERMINATED BY '\r\n'
+IGNORE 1 ROWS;
