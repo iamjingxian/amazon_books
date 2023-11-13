@@ -1,0 +1,181 @@
+// change underlying db to relevnt db
+use amazon_db
+
+// create index
+db.external.createIndex({eid: 1})
+db.item.createIndex({asin: 1})
+db.item_external.createIndex({asin: 1, eid: 1})
+db.mongo_items_arry.createIndex({asin: 1})
+
+
+// 1a.
+db.item.aggregate([
+    {
+       	$group: {
+            _id: "$reviewerName",
+            review_count: { $sum: 1 },
+	    } 
+    },
+    {$sort: {review_count: -1}},
+    {
+        $project : {
+        _id : 1,
+        review_count : 0
+        }
+    },
+    {$limit: 5}
+])
+
+
+// 1b.
+db.mongo_items_array.aggregate([
+    { $unwind: '$category'},
+    { $match: {"category": "Piano"}},
+    {
+       	$group: {
+            _id: "$category",
+            book_count: { $sum: 1 },
+	    } 
+    },
+    {
+        $project : {
+        _id : 0,
+        book_count : 1
+        }
+    }
+])
+
+// 1c
+db.mongo_items_array.aggregate([
+    { $unwind: '$category'},
+    { $match: {"category": "Music"}},
+    {
+        $lookup: {
+            from: "item",
+            localField: "asin",
+            foreignField: "asin",
+            as: "item"
+        }
+    },
+    { $unwind: '$item'},
+    { $match: {"item.overall": {$ne:null}}},
+    {
+         $group: {
+            _id: "$category",
+            avg_rating: {$avg: "$item.overall"},
+	    } 
+    },
+    {
+        $project : {
+        _id : 0,
+        avg_rating : 1
+        }
+    }
+])
+
+
+// 2a.
+db.mongo_items_array.aggregate([
+    { $unwind: '$author'},
+    { $match: {"author": "William Shakespeare"}},
+    {
+       	$group: {
+            _id: "$author",
+            book_count: { $sum: 1 },
+	    } 
+    },
+    {
+        $project : {
+        _id : 0,
+        book_count: 1
+        }
+    }
+])
+
+// 3a
+db.mongo_items_array.aggregate([
+    { $unwind: '$author'},
+    { $match: {"author": {$ne:null}}},
+    { $match: {"author": "William Shakespeare"}},
+    {
+        $lookup: {
+            from: "item",
+            localField: "asin",
+            foreignField: "asin",
+            as: "item"
+        }
+    },
+    { $unwind: '$item'},
+    { $match: {"item.overall": {$ne:null}}},
+    {
+       	$group: {
+            _id: "$title",
+            average_rating: { $avg: "$item.overall" },
+            
+	    } 
+    },
+    {
+        $match: {
+            "average_rating": { $gt: 4 }
+        }
+    },
+    {$sort: {average_rating: -1}}
+])
+
+// 4a
+db.item_external.aggregate([
+    {
+        $lookup: {
+            from: "external",
+            localField: "eid",
+            foreignField: "eid",
+            as: "external"
+        }
+    },
+    {
+        $lookup: {
+            from: "item",
+            localField: "asin",
+            foreignField: "asin",
+            as: "item"
+        }
+    },
+    {
+        $lookup: {
+            from: "mongo_items_array",
+            localField: "asin",
+            foreignField: "asin",
+            as: "mongo_items_array"
+        }
+    },
+    {
+        $group: {
+            _id: "$title",
+            external_rating: {$avg: "$external.rating"},
+            amazon_rating: {$avg: "$item.overall"}
+	    }
+    },
+    {
+        $match: {
+            "external_rating": { $gt: 3 }, 
+            "amazon_rating": { $gt: 3 }
+        }
+    }
+])
+
+// 5a
+db.item.aggregate([{
+    "$group": {
+        _id: "$reviewerID",
+        doc: {"$first": "$$ROOT"}
+    }},
+    {$group: {
+        _id: "$verified",
+        count: { $sum: 1 }
+    }},
+    {$project: {
+        _id: 0,
+        verified: "$_id",
+        count: 1
+    }
+}])
