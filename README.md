@@ -9,7 +9,8 @@ dataset sources (note: >20Gb combined, require decent RAM and processor)
 scripts
 - run notebook to unpack data files, and generate csv files for individual relations tables to be loaded into an RDMS (in our case, MySQL)
 - run sql in MySQL workbench to load relation tables
-- run scipt to convert strings in json to array, to be imported to MongoDB. 
+- run scipt to convert strings in json to array, to be imported to MongoDB.
+- run sample queries per script. see link to [video demo of queries](https://drive.google.com/drive/folders/12ji0QyLGWv9pNM24RzIrL_OY-6UdUQEY?usp=sharing) 
 
 References<br>
 - amazon dataset. Jianmo Ni, Jiacheng Li, Julian McAuley, Empirical Methods in Natural Language Processing (EMNLP), 2019
